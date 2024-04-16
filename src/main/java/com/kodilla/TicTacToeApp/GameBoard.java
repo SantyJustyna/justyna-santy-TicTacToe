@@ -28,12 +28,22 @@ public class GameBoard {
         return s;
     }
 
+    public boolean checkMove(Move move) {
+        if (getFigure(move.getCol(), move.getRow()) != Figure.EMPTY) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public boolean makeMove(Move move, Figure figure) {
         if (getFigure(move.getCol(), move.getRow()) != Figure.EMPTY) {
             return false;
         }
+
         setFigure(move.getCol(), move.getRow(), figure);
         return true;
+
     }
 
     public Winner getWinner() {
@@ -44,6 +54,7 @@ public class GameBoard {
 
         return winner;
     }
+
     private Winner getDiagonalWinner() {
         Winner winner = Winner.NONE;
         for (int row = 0; row < rows.size(); row++) {
@@ -64,19 +75,20 @@ public class GameBoard {
     }
 
     private Winner leftOrRightDownDiagonalWinner(int col, int row, boolean isLeft) {
-        boolean isXWinner = true;
-        boolean isOWinner = true;
+
         int x = col;
         int y = row;
         int length = (rows.size() <= 5) ? rows.size() : 5;
+        List<Figure> diagX = new ArrayList<>();
+        List<Figure> diagO = new ArrayList<>();
+
         while ((isLeft && (x >= col - length) || (!isLeft && (x <= col + length))) && y <= row + length) {
+
             if (x < 0 || y > rows.size() - 1 || x > rows.size() - 1) {
-                isOWinner = false;
-                isXWinner = false;
-            } else if (getFigure(x, y) != Figure.X) {
-                isXWinner = false;
-            } else if (getFigure(x, y) != Figure.O) {
-                isOWinner = false;
+            } else if (getFigure(x, y) == Figure.X) {
+                diagX.add(Figure.X);
+            } else if (getFigure(x, y) == Figure.O) {
+                diagO.add(Figure.O);
             }
             if (isLeft) {
                 x--;
@@ -85,14 +97,13 @@ public class GameBoard {
             }
             y++;
         }
-        if (isXWinner)
+        if (diagX.size() == length)
             return Winner.X;
-        else if (isOWinner)
+        else if (diagO.size() == length)
             return Winner.O;
         else
             return Winner.NONE;
     }
-
 
     private Winner getRowWinner() {
         Winner winner = Winner.NONE;
@@ -107,24 +118,39 @@ public class GameBoard {
     private Winner getOneRowWinner(int row) {
         boolean isXWinner = true;
         boolean isOWinner = true;
+        int length = (rows.size() <= 5) ? rows.size() : 5;
+        List<Figure> rowX = new ArrayList<>();
+        List<Figure> rowO = new ArrayList<>();
+
         for (int col = 0; col < rows.size(); col++) {
             Figure figure = getFigure(col, row);
-            if (figure != Figure.X)
-                isXWinner = false;
-            if (figure != Figure.O)
-                isOWinner = false;
+
+            if (figure == Figure.X)
+                rowX.add(Figure.X);
+            if (figure == Figure.O)
+                rowO.add(Figure.O);
+
+            if (rowX.size() == length || rowO.size() == length) {
+                break;
+            }
         }
-        if (isXWinner)
+
+        if (rowX.size() == length) {
             return Winner.X;
-        if (isOWinner)
+        }
+        if (rowO.size() == length) {
             return Winner.O;
-        return Winner.NONE;    }
+        }
+        return Winner.NONE;
+    }
 
     private Winner getColumnWinner() {
         Winner winner = Winner.NONE;
+
         for (int col = 0; col < rows.size(); col++) {
             if (winner == Winner.NONE) {
                 winner = getOneColumnWinner(col);
+
             }
         }
         return winner;
@@ -133,21 +159,34 @@ public class GameBoard {
     private Winner getOneColumnWinner(int col) {
         boolean isXWinner = true;
         boolean isOWinner = true;
+        int length = (rows.size() <= 5) ? rows.size() : 5;
+        List<Figure> columnX = new ArrayList<>();
+        List<Figure> columnO = new ArrayList<>();
+
         for (int row = 0; row < rows.size(); row++) {
             Figure figure = getFigure(col, row);
-            if (figure != Figure.X)
-                isXWinner = false;
-            if (figure != Figure.O)
-                isOWinner = false;
+
+            if (figure == Figure.X)
+                columnX.add(Figure.X);
+            if (figure == Figure.O)
+                columnO.add(Figure.O);
+
+            if (columnX.size() == length || columnO.size() == length) {
+                break;
+            }
+
         }
-        if (isXWinner)
+
+        if (columnX.size() == length) {
             return Winner.X;
-        if (isOWinner)
+        }
+        if (columnO.size() == length) {
             return Winner.O;
+        }
         return Winner.NONE;
     }
-    public String showDraw(){
 
+    public String showDraw() {
         return "Game over! It's a draw!!";
     }
 }
